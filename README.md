@@ -1,31 +1,93 @@
-# LAB1 – Red Object Detection and Tracking in Video
+# LAB1 – Detekcja i śledzenie czerwonego obiektu w wideo
 
-This project was created as part of a university computer vision lab using **Python**, **OpenCV**, and **NumPy**.
+Projekt z wykorzystaniem **OpenCV** i **NumPy**, którego celem jest detekcja oraz śledzenie czerwonego obiektu w nagraniu wideo.  
+Pozycja obiektu wyznaczana jest na podstawie **momentów geometrycznych** obliczanych z binarnej maski koloru czerwonego.
 
-The program detects and tracks a **red bottle cap** in a video file. It uses **HSV color segmentation**, **morphological operations**, and **image moments** to estimate the position and size of the object.
+## Funkcjonalności
 
-## Features
+- wczytywanie pliku wideo z parametru uruchomieniowego `--video`
+- detekcja czerwonego obiektu w przestrzeni barw **HSV**
+- uwzględnienie dwóch zakresów czerwieni (ze względu na zawijanie Hue w HSV)
+- czyszczenie maski operacjami morfologicznymi:
+  - **OPEN** – usuwanie drobnych szumów
+  - **CLOSE** – zamykanie dziur w obiekcie
+- wyznaczanie środka obiektu z **momentów**
+- wizualizacja:
+  - okrąg obejmujący wykryty obiekt
+  - zaznaczenie środka obiektu
+  - pionowa linia środka kadru
+  - paski pokazujące odchylenie obiektu od środka obrazu
+- dwa okna podglądu:
+  - obraz oryginalny z oznaczeniami
+  - obraz przetworzony (maska po segmentacji i morfologii)
 
-- video loading from command line argument
-- red color detection in **HSV**
-- support for red hue wrap-around using **two HSV ranges**
-- noise removal using **OPEN** and **CLOSE** morphology
-- object center estimation using **image moments**
-- circle visualization around detected object
-- horizontal deviation bars showing left/right offset from image center
-- two display windows:
-  - original video with tracking overlay
-  - processed binary mask
+## Wymagania
 
-## Technologies
+Projekt został napisany w **Python 3**.
 
-- Python 3
-- OpenCV
-- NumPy
+Wymagane biblioteki:
+- `opencv-python`
+- `numpy`
 
-## Project structure
+## Instalacja
+
+Zainstaluj wymagane pakiety poleceniem:
+
+```bash
+pip install opencv-python numpy
+```
+
+Uruchomienie
+
+```bash
+python main.py --video sample.mp4
+```
+
+Można także ustawić minimalne pole wykrywanego obiektu:
+
+```bash
+python main.py --video sample.mp4 --min-pole 300
+```
+
+## Parametry
+
+- `--video` – ścieżka do pliku wideo (wymagany parametr)
+- `--min-pole` – minimalne pole obiektu w pikselach, poniżej którego obiekt jest ignorowany
+
+## Jak działa program
+
+1. Program wczytuje kolejne klatki z pliku wideo.
+2. Każda klatka jest konwertowana z przestrzeni **BGR** do **HSV**.
+3. Tworzona jest maska dla koloru czerwonego z dwóch zakresów Hue.
+4. Maska jest czyszczona przy pomocy operacji morfologicznych **OPEN** i **CLOSE**.
+5. Na podstawie maski obliczane są momenty geometryczne.
+6. Jeśli pole wykrytego obiektu jest wystarczająco duże:
+   - wyznaczany jest środek obiektu
+   - szacowany jest promień okręgu na podstawie pola
+   - rysowane są elementy wizualizacji na obrazie oryginalnym
+7. Program wyświetla dwa okna podglądu aż do końca nagrania lub naciśnięcia `q` / `ESC`.
+
+## Struktura projektu
 
 ```text
 .
-├── lab1_object_detection.py
-└── F1.MOV
+├── main.py
+└── README.md
+```
+
+## Sterowanie
+
+- `q` – zakończenie programu
+- `ESC` – zakończenie programu
+
+## Zastosowane techniki
+
+- segmentacja koloru w przestrzeni **HSV**
+- progowanie obrazu przy użyciu `cv2.inRange()`
+- operacje morfologiczne:
+  - `cv2.MORPH_OPEN`
+  - `cv2.MORPH_CLOSE`
+- wyznaczanie środka obiektu z wykorzystaniem `cv2.moments()`
+- wizualizacja wyników przy pomocy funkcji rysujących OpenCV
+
+Program uruchamia się z poziomu terminala, podając ścieżkę do pliku wideo:
